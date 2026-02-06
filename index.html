@@ -2,7 +2,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>February Hydrogen Safety Connections</title>
+<title>February Hydrogen Safety Categories</title>
 <style>
   :root{
     --chs-blue:#005e82;
@@ -67,13 +67,15 @@
 <body>
 <div class="wrap">
 
-  <!-- This header always shows even if JS fails -->
   <div class="card">
-    <h1>February Hydrogen Safety Connections</h1>
-    <p class="sub">Select 4 related terms to form a category. Shuffle anytime. “One away” hints appear when 3 of 4 match a real group.</p>
+    <h1>February Hydrogen Safety Categories</h1>
+    <p class="sub">
+      Select 4 related terms to form a category. Shuffle anytime. “One away” hints appear when 3 of 4 match a real category.
+    </p>
+
     <div class="meta">
       <div class="pill">⏱ Time: <strong id="timer">00:00</strong></div>
-      <div class="pill">✅ Groups solved: <strong id="solvedCount">0</strong>/4</div>
+      <div class="pill">✅ Categories solved: <strong id="solvedCount">0</strong>/4</div>
     </div>
 
     <div class="controls">
@@ -88,10 +90,22 @@
 
     <div id="answers" class="answers">
       <h3>Solution</h3>
-      <div class="group"><strong>🟨 Codes & Standards</strong><br>NFPA 2 • ISO 19880 • CGA G-5.5 • ASME B31.12</div>
-      <div class="group"><strong>🟩 Fueling Station Components</strong><br>Dispenser • Breakaway Coupling • Nozzle • Cascade Storage</div>
-      <div class="group"><strong>🟦 Emergency Response Concepts</strong><br>Isolation Distance • Gas Monitoring • Evacuation Plan • Incident Command</div>
-      <div class="group"><strong>🟪 Hydrogen Physical Properties</strong><br>Wide Flammability Range • Low Ignition Energy • High Diffusivity • Buoyant Gas</div>
+
+      <div class="group"><strong>🟨 Codes & Standards</strong><br>
+        NFPA 2 • ISO 19880 • CGA G-5.5 • ASME B31.12
+      </div>
+
+      <div class="group"><strong>🟩 Fueling Station Components</strong><br>
+        Dispenser • Breakaway Coupling • Nozzle • Cascade Storage
+      </div>
+
+      <div class="group"><strong>🟦 Emergency Response Concepts</strong><br>
+        Isolation Distance • Gas Monitoring • Evacuation Plan • Incident Command
+      </div>
+
+      <div class="group"><strong>🟪 Hydrogen Physical Properties</strong><br>
+        Wide Flammability Range • Low Ignition Energy • High Diffusivity • Buoyant Gas
+      </div>
     </div>
 
     <div class="foot">Tip: Use this as a quick training icebreaker.</div>
@@ -223,18 +237,18 @@ document.addEventListener("DOMContentLoaded", () => {
         solvedCountEl.textContent = String(solvedCount);
         groups.splice(idx, 1);
 
-        message.textContent = `✅ Correct! Group found: ${g.name}`;
+        message.textContent = `✅ Correct! Category found: ${g.name}`;
         clearSelectionsUI();
         render();
 
         if (solvedCount === 4){
           stopTimer();
-          message.textContent = "🎉 All groups solved!";
+          message.textContent = "🎉 All categories solved!";
           submitBtn.disabled = true;
         }
       } else {
         const hint = oneAwayHint();
-        message.textContent = hint ? `🟨 One away! You're close to: ${hint}` : "❌ Not a valid group — try again!";
+        message.textContent = hint ? `🟨 One away! You're close to: ${hint}` : "❌ Not a valid category — try again!";
         clearSelectionsUI();
       }
     });
@@ -263,9 +277,9 @@ document.addEventListener("DOMContentLoaded", () => {
       message.textContent = "Answers revealed.";
       clearSelectionsUI();
       render();
+      submitBtn.disabled = true;
     });
 
-    // initial render
     render();
 
   } catch (err){
