@@ -79,4 +79,191 @@ h1{ color:var(--chs-blue); margin-bottom:6px; }
 
 button{
   margin:10px 6px 0;
-  padding:10
+  padding:10px 16px;
+  background:var(--chs-blue);
+  color:white;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+}
+
+button.secondary{ background:#666; }
+
+button:disabled{ background:#ccc; cursor:default; }
+
+.message{ margin-top:14px; min-height:22px; }
+
+.answers{
+  display:none;
+  margin-top:18px;
+  background:white;
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:14px;
+  text-align:left;
+}
+.answers h3{ margin-top:0; color:var(--chs-blue); }
+</style>
+</head>
+
+<body>
+<div class="wrap">
+
+<h1>February Hydrogen Safety Connections</h1>
+<p class="sub">Group the 16 tiles into 4 related hydrogen safety categories.</p>
+
+<div class="meta">
+  <div class="pill">⏱ Time: <strong id="timer">00:00</strong></div>
+  <div class="pill">✅ Groups solved: <strong id="solvedCount">0</strong>/4</div>
+</div>
+
+<button id="submitBtn" disabled>Submit</button>
+<button id="shuffleBtn" class="secondary">Shuffle</button>
+<button id="revealBtn" class="secondary">Reveal Answers</button>
+
+<div class="grid" id="grid"></div>
+
+<div class="message" id="message"></div>
+
+<div class="answers" id="answers">
+<h3>Solution</h3>
+<p><strong>🟨 Codes & Standards</strong><br>
+NFPA 2 • ISO 19880 • CGA G-5.5 • ASME B31.12</p>
+
+<p><strong>🟩 Fueling Station Components</strong><br>
+Dispenser • Breakaway Coupling • Nozzle • Cascade Storage</p>
+
+<p><strong>🟦 Emergency Response Concepts</strong><br>
+Isolation Distance • Gas Monitoring • Evacuation Plan • Incident Command</p>
+
+<p><strong>🟪 Hydrogen Physical Properties</strong><br>
+Wide Flammability Range • Low Ignition Energy • High Diffusivity • Buoyant Gas</p>
+</div>
+
+</div>
+
+<script>
+const TERMS = [
+"NFPA 2","ISO 19880","CGA G-5.5","ASME B31.12",
+"Dispenser","Breakaway Coupling","Nozzle","Cascade Storage",
+"Isolation Distance","Gas Monitoring","Evacuation Plan","Incident Command",
+"Wide Flammability Range","Low Ignition Energy","High Diffusivity","Buoyant Gas"
+];
+
+const GROUPS = [
+{ name:"Codes & Standards", items:["NFPA 2","ISO 19880","CGA G-5.5","ASME B31.12"] },
+{ name:"Fueling Station Components", items:["Dispenser","Breakaway Coupling","Nozzle","Cascade Storage"] },
+{ name:"Emergency Response Concepts", items:["Isolation Distance","Gas Monitoring","Evacuation Plan","Incident Command"] },
+{ name:"Hydrogen Physical Properties", items:["Wide Flammability Range","Low Ignition Energy","High Diffusivity","Buoyant Gas"] }
+];
+
+const COLORS=["yellow","green","blue","purple"];
+
+let groups=[];
+let selected=[];
+let solvedCount=0;
+let solvedMap=new Map();
+
+let startTime=null;
+let timerInterval=null;
+
+const grid=document.getElementById("grid");
+const submitBtn=document.getElementById("submitBtn");
+const shuffleBtn=document.getElementById("shuffleBtn");
+const revealBtn=document.getElementById("revealBtn");
+const message=document.getElementById("message");
+const timerEl=document.getElementById("timer");
+const solvedCountEl=document.getElementById("solvedCount");
+const answers=document.getElementById("answers");
+
+function shuffle(arr){
+let a=arr.slice();
+for(let i=a.length-1;i>0;i--){
+let j=Math.floor(Math.random()*(i+1));
+[a[i],a[j]]=[a[j],a[i]];
+}
+return a;
+}
+
+function startTimer(){
+if(startTime) return;
+startTime=Date.now();
+timerInterval=setInterval(()=>{
+let diff=Math.floor((Date.now()-startTime)/1000);
+let mm=String(Math.floor(diff/60)).padStart(2,"0");
+let ss=String(diff%60).padStart(2,"0");
+timerEl.textContent=`${mm}:${ss}`;
+},500);
+}
+
+function build(){
+grid.innerHTML="";
+selected=[];
+submitBtn.disabled=true;
+message.textContent="";
+groups=GROUPS.map(g=>({name:g.name,items:g.items.slice()}));
+
+let shuffled=shuffle(TERMS);
+shuffled.forEach(term=>{
+let div=document.createElement("div");
+div.className="tile";
+div.textContent=term;
+
+if(solvedMap.has(term)){
+div.classList.add("solved",solvedMap.get(term));
+}
+
+div.onclick=()=>{
+if(div.classList.contains("solved")) return;
+startTimer();
+if(selected.includes(term)){
+selected=selected.filter(t=>t!==term);
+div.classList.remove("selected");
+}else if(selected.length<4){
+selected.push(term);
+div.classList.add("selected");
+}
+submitBtn.disabled=(selected.length!==4);
+};
+
+grid.appendChild(div);
+});
+}
+
+submitBtn.onclick=()=>{
+let matchIndex=groups.findIndex(g=>g.items.every(i=>selected.includes(i)));
+
+if(matchIndex!==-1){
+let color=COLORS[solvedCount];
+groups[matchIndex].items.forEach(t=>solvedMap.set(t,color));
+groups.splice(matchIndex,1);
+solvedCount++;
+solvedCountEl.textContent=solvedCount;
+message.textContent="✅ Correct!";
+}else{
+let near=groups.find(g=>g.items.filter(i=>selected.includes(i)).length===3);
+message.textContent=near?"🟨 One away!":"❌ Try again.";
+}
+
+selected=[];
+submitBtn.disabled=true;
+build();
+
+if(solvedCount===4){
+clearInterval(timerInterval);
+message.textContent="🎉 All groups solved!";
+}
+};
+
+shuffleBtn.onclick=()=>build();
+
+revealBtn.onclick=()=>{
+answers.style.display="block";
+clearInterval(timerInterval);
+};
+
+build();
+</script>
+
+</body>
+</html>
